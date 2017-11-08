@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import escapeRegExp from 'escape-string-regexp';
+import sortBy from 'sort-by';
 
 class ListContacts extends Component {
     constructor(props) {
@@ -7,10 +9,16 @@ class ListContacts extends Component {
             query: '',
             contacts: []
         };
+        this.handleQuery = this.handleQuery.bind(this);
+        this.clearQuery = this.clearQuery.bind(this);
     }
 
     handleQuery({ target }) {
-        this.setState({query: target.value});
+        this.setState({query: target.value.trim()});
+    }
+
+    clearQuery() {
+        this.setState({query: ''});
     }
 
     render() {
@@ -19,15 +27,29 @@ class ListContacts extends Component {
         let filteredContacts = contacts;
 
         if (query) {
-            // todo;
+            const match = new RegExp(escapeRegExp(query), 'i')
+            filteredContacts = contacts.filter(({ name }) => match.test(name))
         }
+
+        filteredContacts.sort(sortBy('name'));
 
         return(
             <div className="list-contacts">
-                <input className="search-contacts" 
-                       type="search" 
-                       value={this.state.query} 
-                       onChange={this.handleQuery} />
+                <div className='list-contacts-top'>
+                    <input className="search-contacts" 
+                        type="search" 
+                        placeholder='Search contacts'
+                        value={query} 
+                        onChange={this.handleQuery} />
+                </div>
+
+                {filteredContacts.length !== contacts.length && (
+                    <div className='showing-contacts'>
+                        <span>Now showing {filteredContacts.length} of {contacts.length} total</span>
+                        <button onClick={this.clearQuery}>Show all</button>
+                    </div>
+                )}
+                
                 <ol className="contact-list">
                     {filteredContacts.map((contact) => (
                         <li className="contact-list-item" key={contact.id}>

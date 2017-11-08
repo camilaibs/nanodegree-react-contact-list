@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import CreateContact from './CreateContact';
 import ListContacts from './ListContacts';
 import { getAll, remove, create } from './utils/ContactsAPI';
 
@@ -6,6 +7,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      screen: 'list',
       contacts: []
     };
     this.onDeleteContact = this.onDeleteContact.bind(this);
@@ -34,10 +36,17 @@ class App extends Component {
   }
 
   render() {
-    const { contacts } = this.state;
+    const { screen, contacts } = this.state;
 
     return (
-      <ListContacts contacts={contacts} />
+      <div>
+        {screen === 'list' && (
+          <ListContacts contacts={contacts} onDeleteContact={this.onDeleteContact} />
+        )}
+        {screen === 'create' && (
+          <CreateContact/>
+        )}
+      </div>
     )
   }
 }
